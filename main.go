@@ -1,48 +1,30 @@
 package main
 
 import(
-  "os"
   "fmt"
-  "flag"
-  "dev/hello"
+  "github.com/voxelbrain/goptions"
 )
 
 // Global Flags
 var force bool
 
-func do() {
-  doFlags := flag.NewFlagSet("do", flag.ExitOnError)
-  doFlags.BoolVar(&force, "f", false, "force")
-  doFlags.Parse(flag.Args()[1:])
-  if doFlags.Parsed() {
-    if len(doFlags.Args()) == 0 {
-      fmt.Println("Must provide something to do!")
-      os.Exit(1)
-    }
-	  fmt.Printf("Run Command: %q\n", doFlags.Args())
-  }
-}
-
-func parseFlags() {
-  // Global Flags
-  flag.BoolVar(&force, "f", false, "force")
-  flag.Parse()
-
-  if len(flag.Args()) <= 0 {
-    hello.World()
-    os.Exit(1)
-  }
-
-  switch flag.Args()[0] {
-  case "do":
-    do()
-  case "hello":
-    hello.World()
-  default:
-  }
-}
-
 func main() {
-  fmt.Println("**  KCLI  **")
-  parseFlags()
+  options := struct {
+		Force bool          `goptions:"-f, --force, description='Fuce - Rho - Dah'"`
+		Help  goptions.Help `goptions:"-h, --help, description='Show this help'"`
+
+		goptions.Verbs
+		Do struct {
+			Action  string `goptions:"-a, --name, obligatory, description='Name of the entity to be deleted'"`
+			Force bool   `goptions:"-f, --force, description='Force removal'"`
+		} `goptions:"do"`
+
+	}{ // Default values go here
+		// Force: true,
+	}
+	goptions.ParseAndFail(&options)
+
+  fmt.Println(options)
+
+
 }
