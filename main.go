@@ -3,43 +3,59 @@ package main
 import(
   "os"
   "fmt"
-  "flag"
+  "bytes"
+  "strings"
+  "os/exec"
+  "github.com/voxelbrain/goptions"
 )
 
 // Global Flags
 var force bool
 
-func do() {
-  doFlags := flag.NewFlagSet("do", flag.ExitOnError)
-  doFlags.BoolVar(&force, "f", false, "force")
-  doFlags.Parse(flag.Args()[1:])
-  if doFlags.Parsed() {
-    if len(doFlags.Args()) == 0 {
-      fmt.Println("Must provide something to do!")
-      os.Exit(1)
-    }
-	  fmt.Printf("Run Command: %q\n", doFlags.Args())
-  }
-}
-
-func parseFlags() {
-  // Global Flags
-  flag.BoolVar(&force, "f", false, "force")
-  flag.Parse()
-
-  if len(flag.Args()) <= 0 {
-    fmt.Println("Must Provide Command")
-    os.Exit(1)
-  }
-
-  switch flag.Args()[0] {
-  case "do":
-    do()
-  default:
-  }
+func concat(s1, s2 string) string{
+  var buffer bytes.Buffer
+  buffer.WriteString(s1)
+  buffer.WriteString(" ")
+  buffer.WriteString(s2)
+  return buffer.String()
 }
 
 func main() {
-  fmt.Println("**  KCLI  **")
-  parseFlags()
+  options := struct {
+		Force bool          `goptions:"-f, --force, description='Fuce - Rho - Dah'"`
+		Help  goptions.Help `goptions:"-h, --help, description='Show this help'"`
+    Remainder goptions.Remainder
+
+		goptions.Verbs
+		Do struct {
+			Action  string `goptions:"-a, --action, description='Perform Action'"`
+			Force bool   `goptions:"-f, --force, description='Force Action'"`
+		} `goptions:"do"`
+
+    Say struct {
+			Phrase string `goptions:"-p, --phrase, description='Will attempt to say <phrase> outloud'"`
+		} `goptions:"say"`
+
+	}{ // Default values go here
+		// Force: true,
+	}
+
+  err := goptions.Parse(&options)
+  if err != nil {
+    fmt.Println(err)
+    os.Exit(1)
+  }
+
+  switch options.Verbs {
+  case "do":
+    fmt.Println("Doing Stuff")
+  case "say":
+    phrase := concat(options.Say.Phrase, strings.Join(options.Remainder, " "))
+    fmt.Println("Saying Phrase:", phrase)
+    cmd := "say "+phrase
+    exec.Command("sh","-c",cmd).Output()
+  default:
+    goptions.PrintHelp()
+  }
+
 }
