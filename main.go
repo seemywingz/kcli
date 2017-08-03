@@ -4,7 +4,6 @@ import(
   "os"
   "fmt"
   "flag"
-  "dev/hello"
 )
 
 // Global Flags
@@ -29,15 +28,13 @@ func parseFlags() {
   flag.Parse()
 
   if len(flag.Args()) <= 0 {
-    hello.World()
+    fmt.Println("Must Provide Command")
     os.Exit(1)
   }
 
   switch flag.Args()[0] {
   case "do":
     do()
-  case "hello":
-    hello.World()
   default:
   }
 }
