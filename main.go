@@ -22,15 +22,13 @@ func concat(s1, s2 string) string{
 
 func main() {
   options := struct {
-		Force bool          `goptions:"-f, --force, description='Fuce - Rho - Dah'"`
 		Help  goptions.Help `goptions:"-h, --help, description='Show this help'"`
     Remainder goptions.Remainder
 
 		goptions.Verbs
-		Do struct {
-			Action  string `goptions:"-a, --action, description='Perform Action'"`
-			Force bool   `goptions:"-f, --force, description='Force Action'"`
-		} `goptions:"do"`
+		Run struct {
+			Sudo bool   `goptions:"-s, --sudo, description='Run as Superuser'"`
+		} `goptions:"run"`
 
     Say struct {
 			Phrase string `goptions:"-p, --phrase, description='Will attempt to say <phrase> outloud'"`
@@ -47,8 +45,16 @@ func main() {
   }
 
   switch options.Verbs {
-  case "do":
-    fmt.Println("Doing Stuff")
+  case "run":
+    cmd := options.Remainder[0]
+    args := strings.Join(options.Remainder[1:], " ")
+    fmt.Println("Running:",cmd)
+    out, err := exec.Command(cmd,args).Output()
+    if err != nil {
+      fmt.Println("⛔  Error when running command:", cmd, err)
+      os.Exit(1)
+    }
+    fmt.Println(out)
   case "say":
     phrase := concat(options.Say.Phrase, strings.Join(options.Remainder, " "))
     fmt.Println("Saying Phrase:", phrase)
