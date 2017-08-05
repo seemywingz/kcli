@@ -9,6 +9,7 @@ type optionsDef struct {
 	Tail goptions.Help `goptions:"-t, --tail, description='Follow the logs'"`
 
 	goptions.Verbs
+
 	Status struct {
 	} `goptions:"status"`
 

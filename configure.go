@@ -76,7 +76,7 @@ func Configure() {
 
 // GetConfig : Check to see if there is a config file, if not create one
 func GetConfig() {
-	homeDir := gtills.GetHomeDir()
+	homeDir = gtills.GetHomeDir()
 	if homeDir == "" {
 		os.Exit(1)
 	}
