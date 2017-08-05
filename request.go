@@ -1,9 +1,10 @@
 package main
 
 import (
-  "fmt"
+	"fmt"
 )
 
-func Request(){
-  fmt.Println("Requesting New DitC")
+// Request : request a new ditc
+func Request() {
+	fmt.Println("Requesting New DitC")
 }

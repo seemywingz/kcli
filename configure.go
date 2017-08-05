@@ -7,11 +7,9 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	gt "github.com/seemywingz/gtills"
 )
 
-const configDir = ".myApp"
+const configDir = ".kcli"
 const configFileName = "config"
 
 var homeDir, configFile string
@@ -20,14 +18,23 @@ type jsonConfig struct {
 	Fname string `json:"fname"`
 	Lname string `json:"lname"`
 	Email string `json:"email"`
+	IP    string `json:"ip"`
 }
 
 var config jsonConfig
 
-func saveConfig() {
+// SaveConfig : writes the current config to disk
+func SaveConfig() {
 	data, jsoEerr := json.Marshal(config)
-	gt.E(jsoEerr, "Error Parsing Json:")
-	gt.E(ioutil.WriteFile(configFile, data, 0644), "Error Saving Config File:")
+	EoE(jsoEerr, "Error Parsing Json:")
+	EoE(ioutil.WriteFile(configFile, data, 0644), "Error Saving Config File:")
+}
+
+// ListConfig : prints the current config
+func ListConfig() {
+	configJSON, err := json.MarshalIndent(config, "", "   ")
+	EoE(err, "Error Parsing Json")
+	fmt.Println("📖  Reading Config", configFile, "\n", string(configJSON))
 }
 
 // Configure : Gather User Informaton and save it to config file
@@ -38,28 +45,28 @@ func Configure() {
 		names := strings.Split(options.Config.Name, " ")
 		config.Fname = names[0]
 		config.Lname = names[1]
-		saveConfig()
+		SaveConfig()
+		ListConfig()
 		return
 	case options.Config.Email != "":
 		config.Email = options.Config.Email
-		saveConfig()
+		SaveConfig()
+		ListConfig()
 		return
 	case options.Config.List:
-		configData, err := ioutil.ReadFile(configFile)
-		gt.E(err, "Error Reading Config File:")
-		fmt.Println(string(configData))
+		ListConfig()
 		return
 	default:
 		fmt.Println("📝  Writing", configFile)
-		gt.SetFromInput(&config.Fname, "\nFirst Name: ")
-		gt.SetFromInput(&config.Lname, " Last Name: ")
-		gt.SetFromInput(&config.Email, "     Email: ")
+		SetFromInput(&config.Fname, "\nFirst Name: ")
+		SetFromInput(&config.Lname, " Last Name: ")
+		SetFromInput(&config.Email, "     Email: ")
 	}
 
-	save := gt.Confirm("Save Configuratuon File?")
-	if save == true {
-		saveConfig()
+	if Confirm("Save Configuratuon File?") {
+		SaveConfig()
 		fmt.Println("\n✨  Configuration File Saved Successfully")
+		os.Exit(0)
 	} else {
 		fmt.Println("\n🚫  Configuration File Not Saved")
 	}
@@ -67,17 +74,16 @@ func Configure() {
 
 // GetConfig : Check to see if there is a config file, if not create one
 func GetConfig() {
-	homeDir := gt.GetHomeDir()
+	homeDir := GetHomeDir()
 	if homeDir == "" {
 		os.Exit(1)
 	}
 	configFile = filepath.Join(homeDir, configDir, configFileName)
 	if _, err := os.Stat(configFile); os.IsNotExist(err) {
 		fmt.Println("❗  CONFIG NOT FOUND")
-		ans := gt.Confirm("⚙  Want to Create one now?")
-		if ans {
+		if Confirm("⚙  Want to Create one now?") {
 			err := os.MkdirAll(filepath.Join(homeDir, configDir), os.ModePerm)
-			gt.E(err, "Error Creating Config Directory:")
+			EoE(err, "Error Creating Config Directory:")
 			Configure()
 		} else {
 			fmt.Println("⏩  Skipping Configuration File Creation")
@@ -85,7 +91,7 @@ func GetConfig() {
 		}
 	} else { // config exists
 		jsonFile, err := ioutil.ReadFile(configFile)
-		gt.E(err, "Error Reading Config File:")
+		EoE(err, "Error Reading Config File:")
 		json.Unmarshal(jsonFile, &config)
 	}
 }

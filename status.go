@@ -1,9 +1,10 @@
 package main
 
 import (
-  "fmt"
+	"fmt"
 )
 
-func Status(){
-  fmt.Println("Getting DitC Status")
+// Status : get current ditc status
+func Status() {
+	fmt.Println("Getting DitC Status")
 }

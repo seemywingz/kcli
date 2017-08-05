@@ -31,7 +31,7 @@ func main() {
 	case "config":
 		Configure()
 	default:
-		// goptions.PrintHelp()
+		ListConfig()
 	}
 
 }
