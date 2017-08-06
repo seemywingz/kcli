@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -15,10 +14,11 @@ const configFileName = "config"
 var homeDir, configFile string
 
 type jsonConfig struct {
-	Fname string `json:"fname"`
-	Lname string `json:"lname"`
-	Email string `json:"email"`
-	IP    string `json:"ip"`
+	Fname    string `json:"fname"`
+	Lname    string `json:"lname"`
+	Email    string `json:"email"`
+	Hostname string `json:"hostname"`
+	IP       string `json:"ip"`
 }
 
 var config jsonConfig
@@ -26,20 +26,23 @@ var config jsonConfig
 // SaveConfig : writes the current config to disk
 func SaveConfig() {
 	data, jsoEerr := json.Marshal(config)
-	EoE(jsoEerr, "Error Parsing Json:")
-	EoE(ioutil.WriteFile(configFile, data, 0644), "Error Saving Config File:")
+	EoE("Error Parsing Json:", jsoEerr)
+	EoE("Error Saving Config File:", ioutil.WriteFile(configFile, data, 0644))
 }
 
 // ListConfig : prints the current config
 func ListConfig() {
-	configJSON, err := json.MarshalIndent(config, "", "   ")
-	EoE(err, "Error Parsing Json")
-	fmt.Println("📖  Reading Config", configFile, "\n", string(configJSON))
+	println("")
+	println("📖  Reading Config\n")
+	println("First Name:📓 ", config.Fname)
+	println(" Last Name:📓 ", config.Lname)
+	println("     Email:📧 ", config.Email)
+	println("  Hostname:🌐 ", config.IP)
+	println("        IP:🌐 ", config.IP)
 }
 
 // Configure : Gather User Informaton and save it to config file
 func Configure() {
-
 	switch {
 	case options.Config.Name != "":
 		names := strings.Split(options.Config.Name, " ")
@@ -57,18 +60,20 @@ func Configure() {
 		ListConfig()
 		return
 	default:
-		fmt.Println("📝  Writing", configFile)
-		SetFromInput(&config.Fname, "\nFirst Name: ")
-		SetFromInput(&config.Lname, " Last Name: ")
-		SetFromInput(&config.Email, "     Email: ")
+		print("\n")
+		println("📝  Writing ", configFile)
+		println("❗  Fields are Required\n")
+		SetFromInput(&config.Fname, "First Name:❗  ")
+		SetFromInput(&config.Lname, " Last Name:❗  ")
+		SetFromInput(&config.Email, "     Email:📧  ")
 	}
 
 	if Confirm("Save Configuratuon File?") {
 		SaveConfig()
-		fmt.Println("\n✨  Configuration File Saved Successfully")
+		println("\n✨  Configuration File Saved Successfully")
 		os.Exit(0)
 	} else {
-		fmt.Println("\n🚫  Configuration File Not Saved")
+		println("\n🚫  Configuration File Not Saved")
 	}
 }
 
@@ -80,18 +85,22 @@ func GetConfig() {
 	}
 	configFile = filepath.Join(homeDir, configDir, configFileName)
 	if _, err := os.Stat(configFile); os.IsNotExist(err) {
-		fmt.Println("❗  CONFIG NOT FOUND")
+		println("❗  CONFIG NOT FOUND")
 		if Confirm("⚙  Want to Create one now?") {
 			err := os.MkdirAll(filepath.Join(homeDir, configDir), os.ModePerm)
-			EoE(err, "Error Creating Config Directory:")
+			EoE("Error Creating Config Directory:", err)
 			Configure()
 		} else {
-			fmt.Println("⏩  Skipping Configuration File Creation")
+			println("⏩  Skipping Configuration File Creation")
 			os.Exit(10)
 		}
 	} else { // config exists
 		jsonFile, err := ioutil.ReadFile(configFile)
-		EoE(err, "Error Reading Config File:")
+		EoE("Error Reading Config File:", err)
 		json.Unmarshal(jsonFile, &config)
+		config.IP = GetIP()
+		name, err := os.Hostname()
+		EoE("Error Getting Hostname", err)
+		config.Hostname = name
 	}
 }

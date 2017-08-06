@@ -2,43 +2,31 @@ package main
 
 import (
 	"bufio"
-	"fmt"
+	"bytes"
+	"io"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"os"
 	"os/user"
-	"strconv"
 	"strings"
 )
 
-// GetJenkinsBuildNumber : get request to find last build number
-func GetJenkinsBuildNumber(jenkinsURL string) int64 {
-	res := SendRequest("GET", jenkinsURL+"/lastBuild/buildNumber", "")
-	buildNum, err := strconv.ParseInt(string(res), 10, 0)
-	EoE(err, "Error Parsing Build Number")
-	return buildNum
-}
-
 // SendRequest : send http request to provided url
-func SendRequest(method, url, body string) []byte {
-	reader := strings.NewReader(body)
-
-	req, err := http.NewRequest(method, url, reader)
-	EoE(err, "Error Formatting HTTP Request")
-
+func SendRequest(req *http.Request) []byte {
 	client := http.Client{}
 	res, err := client.Do(req)
-	EoE(err, "Error Getting HTTP Response")
+	EoE("Error Getting HTTP Response", err)
 
 	resData, err := ioutil.ReadAll(res.Body)
-	EoE(err, "Error Parsing Response")
+	EoE("Error Parsing Response", err)
 	return resData
 }
 
 // EoE : exit with error code 1 and print if err is notnull
-func EoE(err error, msg string) {
+func EoE(msg string, err error) {
 	if err != nil {
-		fmt.Println("❌  "+msg, err)
+		println("❌  "+msg, err)
 		os.Exit(1)
 	}
 }
@@ -46,7 +34,7 @@ func EoE(err error, msg string) {
 // GetHomeDir : returns a full path to user's home dorectory
 func GetHomeDir() string {
 	usr, err := user.Current()
-	EoE(err, "Failed to get Home Directory")
+	EoE("Failed to get Home Directory", err)
 	if usr.HomeDir != "" {
 		return usr.HomeDir
 	}
@@ -77,7 +65,7 @@ func Confirm(q string) bool {
 // GetInput : return string of user input
 func GetInput(q string) string {
 	if q != "" {
-		fmt.Print(q)
+		print(q)
 	}
 	reader := bufio.NewReader(os.Stdin)
 	ans, _ := reader.ReadString('\n')
@@ -87,4 +75,38 @@ func GetInput(q string) string {
 // SetFromInput : set value of provided var to the value of user input
 func SetFromInput(a *string, q string) {
 	*a = strings.TrimRight(GetInput(q), "\n")
+}
+
+// GetIP : get local ip address
+func GetIP() string {
+	addrs, err := net.InterfaceAddrs()
+	EoE("Failed to Get Inet Address", err)
+	for _, a := range addrs {
+		if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			if ipnet.IP.To4() != nil {
+				return ipnet.IP.String()
+			}
+		}
+	}
+	return ""
+}
+
+// LineCounter : count number of lines `\n`
+func LineCounter(r io.Reader) (int, error) {
+	buf := make([]byte, 32*1024)
+	count := 0
+	lineSep := []byte{'\n'}
+
+	for {
+		c, err := r.Read(buf)
+		count += bytes.Count(buf[:c], lineSep)
+
+		switch {
+		case err == io.EOF:
+			return count, nil
+
+		case err != nil:
+			return count, err
+		}
+	}
 }
