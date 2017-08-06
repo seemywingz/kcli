@@ -7,8 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	gtills "github.com/seemywingz/gtills"
 )
 
 const configDir = ".kcli"
@@ -28,14 +26,14 @@ var config jsonConfig
 // SaveConfig : writes the current config to disk
 func SaveConfig() {
 	data, jsoEerr := json.Marshal(config)
-	gtills.EoE(jsoEerr, "Error Parsing Json:")
-	gtills.EoE(ioutil.WriteFile(configFile, data, 0644), "Error Saving Config File:")
+	EoE(jsoEerr, "Error Parsing Json:")
+	EoE(ioutil.WriteFile(configFile, data, 0644), "Error Saving Config File:")
 }
 
 // ListConfig : prints the current config
 func ListConfig() {
 	configJSON, err := json.MarshalIndent(config, "", "   ")
-	gtills.EoE(err, "Error Parsing Json")
+	EoE(err, "Error Parsing Json")
 	fmt.Println("📖  Reading Config", configFile, "\n", string(configJSON))
 }
 
@@ -60,12 +58,12 @@ func Configure() {
 		return
 	default:
 		fmt.Println("📝  Writing", configFile)
-		gtills.SetFromInput(&config.Fname, "\nFirst Name: ")
-		gtills.SetFromInput(&config.Lname, " Last Name: ")
-		gtills.SetFromInput(&config.Email, "     Email: ")
+		SetFromInput(&config.Fname, "\nFirst Name: ")
+		SetFromInput(&config.Lname, " Last Name: ")
+		SetFromInput(&config.Email, "     Email: ")
 	}
 
-	if gtills.Confirm("Save Configuratuon File?") {
+	if Confirm("Save Configuratuon File?") {
 		SaveConfig()
 		fmt.Println("\n✨  Configuration File Saved Successfully")
 		os.Exit(0)
@@ -76,16 +74,16 @@ func Configure() {
 
 // GetConfig : Check to see if there is a config file, if not create one
 func GetConfig() {
-	homeDir = gtills.GetHomeDir()
+	homeDir = GetHomeDir()
 	if homeDir == "" {
 		os.Exit(1)
 	}
 	configFile = filepath.Join(homeDir, configDir, configFileName)
 	if _, err := os.Stat(configFile); os.IsNotExist(err) {
 		fmt.Println("❗  CONFIG NOT FOUND")
-		if gtills.Confirm("⚙  Want to Create one now?") {
+		if Confirm("⚙  Want to Create one now?") {
 			err := os.MkdirAll(filepath.Join(homeDir, configDir), os.ModePerm)
-			gtills.EoE(err, "Error Creating Config Directory:")
+			EoE(err, "Error Creating Config Directory:")
 			Configure()
 		} else {
 			fmt.Println("⏩  Skipping Configuration File Creation")
@@ -93,7 +91,7 @@ func GetConfig() {
 		}
 	} else { // config exists
 		jsonFile, err := ioutil.ReadFile(configFile)
-		gtills.EoE(err, "Error Reading Config File:")
+		EoE(err, "Error Reading Config File:")
 		json.Unmarshal(jsonFile, &config)
 	}
 }
