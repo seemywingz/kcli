@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net"
@@ -26,7 +27,7 @@ func SendRequest(req *http.Request) []byte {
 // EoE : exit with error code 1 and print if err is notnull
 func EoE(msg string, err error) {
 	if err != nil {
-		println("❌  "+msg, err)
+		fmt.Printf("\n❌  %s\n   %s\n", msg, err)
 		os.Exit(1)
 	}
 }
