@@ -35,11 +35,10 @@ func EoE(msg string, err error) {
 // GetHomeDir : returns a full path to user's home dorectory
 func GetHomeDir() string {
 	usr, err := user.Current()
-	EoE("Failed to get Home Directory", err)
+	EoE("Failed to get Current User", err)
 	if usr.HomeDir != "" {
 		return usr.HomeDir
 	}
-	// Maybe it's cross compilation without cgo support. (darwin, unix)
 	return os.Getenv("HOME")
 }
 
