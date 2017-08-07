@@ -13,6 +13,15 @@ import (
 	"strings"
 )
 
+// Loop2D : loop through 2 nested for loops
+func Loop2D(height, width int, logic func(row, col int)) {
+	for row := 0; row < height; row++ {
+		for col := 0; col < width; col++ {
+			logic(row, col)
+		}
+	}
+}
+
 // SendRequest : send http request to provided url
 func SendRequest(req *http.Request) []byte {
 	client := http.Client{}
@@ -27,7 +36,7 @@ func SendRequest(req *http.Request) []byte {
 // EoE : exit with error code 1 and print if err is notnull
 func EoE(msg string, err error) {
 	if err != nil {
-		fmt.Printf("\n❌  %s\n   %s\n", msg, err)
+		fmt.Printf("\n❌  %s\n   %v\n", msg, err)
 		os.Exit(1)
 	}
 }

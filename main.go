@@ -9,9 +9,11 @@ type optionsDef struct {
 	Tail goptions.Help `goptions:"-t, --tail, description='Follow the logs'"`
 
 	goptions.Verbs
-
 	Status struct {
 	} `goptions:"status"`
+
+	Life struct {
+	} `goptions:"life"`
 
 	Config struct {
 		Name  string `goptions:"-n, --name, description='Set Name in config file'"`
@@ -31,6 +33,8 @@ func main() {
 		Status()
 	case "config":
 		Configure()
+	case "life":
+		GameOfLife()
 	default:
 		ListConfig()
 	}
