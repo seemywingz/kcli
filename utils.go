@@ -13,6 +13,15 @@ import (
 	"strings"
 )
 
+// MultiSliceInt : try to return a slice of [][]Type
+func MultiSliceInt(height, width int) [][]int {
+	slice := make([][]int, height)
+	for i := range slice {
+		slice[i] = make([]int, width)
+	}
+	return slice
+}
+
 // Loop2D : loop through 2 nested for loops
 func Loop2D(height, width int, logic func(row, col int)) {
 	for row := 0; row < height; row++ {
