@@ -48,14 +48,14 @@ func getNeighbor(deltaRow, deltaCol int) func(row, col int) bool {
 func applyRules() {
 
 	buf := cells[:][:]
-	f := []func(int, int) bool{}
-	// f[0] = getNeighbor(-1, -1)
-
-	for row := -1; row < 2; row++ {
-		for col := -1; col < 2; col++ {
-			f[0] = getNeighbor(-1, -1)
-		}
-	}
+	// f := []func(int, int) bool{}
+	// // f[0] = getNeighbor(-1, -1)
+	//
+	// for row := -1; row < 2; row++ {
+	// 	for col := -1; col < 2; col++ {
+	// 		f[0] = getNeighbor(-1, -1)
+	// 	}
+	// }
 
 	// f[0].(getNeighbor(-1, -1)
 	// f[0] = getNeighbor(-1, 0)
@@ -66,14 +66,14 @@ func applyRules() {
 	// f[0] = getNeighbor(+1, 0)
 	// f[0] = getNeighbor(+1, -1)
 
-	// nw := getNeighbor(-1, -1)
-	// n := getNeighbor(-1, 0)
-	// ne := getNeighbor(-1, +1)
-	// e := getNeighbor(0, +1)
-	// w := getNeighbor(0, -1)
-	// se := getNeighbor(+1, +1)
-	// s := getNeighbor(+1, 0)
-	// sw := getNeighbor(+1, -1)
+	nw := getNeighbor(-1, -1)
+	n := getNeighbor(-1, 0)
+	ne := getNeighbor(-1, +1)
+	e := getNeighbor(0, +1)
+	w := getNeighbor(0, -1)
+	se := getNeighbor(+1, +1)
+	s := getNeighbor(+1, 0)
+	sw := getNeighbor(+1, -1)
 
 	Loop2D(height, width, func(row, col int) {
 
@@ -81,35 +81,35 @@ func applyRules() {
 		if !inBounds(row, col) {
 			buf[row][col] = 2
 		} else {
-			for i := range f {
-				if f[i](row, col) {
-					neighbors++
-				}
+			// for i := range f {
+			// 	if f[i](row, col) {
+			// 		neighbors++
+			// 	}
+			// }
+			if n(row, col) {
+				neighbors++
 			}
-			// if n(row, col) {
-			// 	neighbors++
-			// }
-			// if ne(row, col) {
-			// 	neighbors++
-			// }
-			// if e(row, col) {
-			// 	neighbors++
-			// }
-			// if se(row, col) {
-			// 	neighbors++
-			// }
-			// if s(row, col) {
-			// 	neighbors++
-			// }
-			// if sw(row, col) {
-			// 	neighbors++
-			// }
-			// if w(row, col) {
-			// 	neighbors++
-			// }
-			// if nw(row, col) {
-			// 	neighbors++
-			// }
+			if ne(row, col) {
+				neighbors++
+			}
+			if e(row, col) {
+				neighbors++
+			}
+			if se(row, col) {
+				neighbors++
+			}
+			if s(row, col) {
+				neighbors++
+			}
+			if sw(row, col) {
+				neighbors++
+			}
+			if w(row, col) {
+				neighbors++
+			}
+			if nw(row, col) {
+				neighbors++
+			}
 			cell := cells[row][col]
 			if cell == 1 { // alive
 				if neighbors < 2 || neighbors > 3 { // dies
