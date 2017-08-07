@@ -48,32 +48,15 @@ func getNeighbor(deltaRow, deltaCol int) func(row, col int) bool {
 func applyRules() {
 
 	buf := cells[:][:]
-	// f := []func(int, int) bool{}
-	// // f[0] = getNeighbor(-1, -1)
-	//
-	// for row := -1; row < 2; row++ {
-	// 	for col := -1; col < 2; col++ {
-	// 		f[0] = getNeighbor(-1, -1)
-	// 	}
-	// }
-
-	// f[0].(getNeighbor(-1, -1)
-	// f[0] = getNeighbor(-1, 0)
-	// f[0] = getNeighbor(-1, +1)
-	// f[0] = getNeighbor(0, +1)
-	// f[0] = getNeighbor(0, -1)
-	// f[0] = getNeighbor(+1, +1)
-	// f[0] = getNeighbor(+1, 0)
-	// f[0] = getNeighbor(+1, -1)
-
-	nw := getNeighbor(-1, -1)
-	n := getNeighbor(-1, 0)
-	ne := getNeighbor(-1, +1)
-	e := getNeighbor(0, +1)
-	w := getNeighbor(0, -1)
-	se := getNeighbor(+1, +1)
-	s := getNeighbor(+1, 0)
-	sw := getNeighbor(+1, -1)
+	f := make([]func(int, int) bool, 8)
+	f[0] = getNeighbor(-1, -1)
+	f[1] = getNeighbor(-1, 0)
+	f[2] = getNeighbor(-1, +1)
+	f[3] = getNeighbor(0, +1)
+	f[4] = getNeighbor(0, -1)
+	f[5] = getNeighbor(+1, +1)
+	f[6] = getNeighbor(+1, 0)
+	f[7] = getNeighbor(+1, -1)
 
 	Loop2D(height, width, func(row, col int) {
 
@@ -81,34 +64,10 @@ func applyRules() {
 		if !inBounds(row, col) {
 			buf[row][col] = 2
 		} else {
-			// for i := range f {
-			// 	if f[i](row, col) {
-			// 		neighbors++
-			// 	}
-			// }
-			if n(row, col) {
-				neighbors++
-			}
-			if ne(row, col) {
-				neighbors++
-			}
-			if e(row, col) {
-				neighbors++
-			}
-			if se(row, col) {
-				neighbors++
-			}
-			if s(row, col) {
-				neighbors++
-			}
-			if sw(row, col) {
-				neighbors++
-			}
-			if w(row, col) {
-				neighbors++
-			}
-			if nw(row, col) {
-				neighbors++
+			for i := range f {
+				if f[i](row, col) {
+					neighbors++
+				}
 			}
 			cell := cells[row][col]
 			if cell == 1 { // alive
