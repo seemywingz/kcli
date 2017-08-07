@@ -16,25 +16,13 @@ func randSeed() {
 	for i := range seed {
 		seed[i] = make([]int, width)
 	}
-	Loop2D(height, width, func(row, col int) {
+
+	for i := 0; i < 500; i++ {
 		rand.Seed(time.Now().UnixNano())
-		randNum := rand.Intn(100)
-		n := 0
-		switch {
-		case !inBounds(row, col):
-			n = 2
-		case randNum%2 == 0:
-			n = 1
-		case randNum%2 > 0:
-			n = 0
-		}
-		seed[row][col] = n
-	})
-	for i := range seed {
-		cells[i] = seed[i]
+		seed[rand.Intn(height)][rand.Intn(width)] = 1
 	}
-	// fmt.Printf("LENGTH: %v\nCAPACITY: %v\nSEED: %v\n", len(seed), cap(seed), seed)
-	// fmt.Printf("LENGTH: %v\nCAPACITY: %v\nCELLS: %v\n", len(cells), cap(cells), cells)
+
+	cells = seed[:][:]
 }
 
 func inBounds(row, col int) bool {
@@ -60,18 +48,32 @@ func getNeighbor(deltaRow, deltaCol int) func(row, col int) bool {
 func applyRules() {
 
 	buf := cells[:][:]
+	f := []func(int, int) bool{}
+	// f[0] = getNeighbor(-1, -1)
 
-	n := getNeighbor(-1, 0)
-	ne := getNeighbor(-1, +1)
+	for row := -1; row < 2; row++ {
+		for col := -1; col < 2; col++ {
+			f[0] = getNeighbor(-1, -1)
+		}
+	}
 
-	e := getNeighbor(0, +1)
-	se := getNeighbor(+1, +1)
+	// f[0].(getNeighbor(-1, -1)
+	// f[0] = getNeighbor(-1, 0)
+	// f[0] = getNeighbor(-1, +1)
+	// f[0] = getNeighbor(0, +1)
+	// f[0] = getNeighbor(0, -1)
+	// f[0] = getNeighbor(+1, +1)
+	// f[0] = getNeighbor(+1, 0)
+	// f[0] = getNeighbor(+1, -1)
 
-	s := getNeighbor(+1, 0)
-	sw := getNeighbor(+1, -1)
-
-	w := getNeighbor(0, -1)
-	nw := getNeighbor(-1, -1)
+	// nw := getNeighbor(-1, -1)
+	// n := getNeighbor(-1, 0)
+	// ne := getNeighbor(-1, +1)
+	// e := getNeighbor(0, +1)
+	// w := getNeighbor(0, -1)
+	// se := getNeighbor(+1, +1)
+	// s := getNeighbor(+1, 0)
+	// sw := getNeighbor(+1, -1)
 
 	Loop2D(height, width, func(row, col int) {
 
@@ -79,31 +81,35 @@ func applyRules() {
 		if !inBounds(row, col) {
 			buf[row][col] = 2
 		} else {
-			if n(row, col) {
-				neighbors++
+			for i := range f {
+				if f[i](row, col) {
+					neighbors++
+				}
 			}
-			if ne(row, col) {
-				neighbors++
-			}
-			if e(row, col) {
-				neighbors++
-			}
-			if se(row, col) {
-				neighbors++
-			}
-			if s(row, col) {
-				neighbors++
-			}
-			if sw(row, col) {
-				neighbors++
-			}
-			if w(row, col) {
-				neighbors++
-			}
-			if nw(row, col) {
-				neighbors++
-			}
-			// fmt.Printf("CEll (%v,%v): alive: %v neighbors: %v\n", row, col, cells[row][col] > 0, neighbors)
+			// if n(row, col) {
+			// 	neighbors++
+			// }
+			// if ne(row, col) {
+			// 	neighbors++
+			// }
+			// if e(row, col) {
+			// 	neighbors++
+			// }
+			// if se(row, col) {
+			// 	neighbors++
+			// }
+			// if s(row, col) {
+			// 	neighbors++
+			// }
+			// if sw(row, col) {
+			// 	neighbors++
+			// }
+			// if w(row, col) {
+			// 	neighbors++
+			// }
+			// if nw(row, col) {
+			// 	neighbors++
+			// }
 			cell := cells[row][col]
 			if cell == 1 { // alive
 				if neighbors < 2 || neighbors > 3 { // dies
@@ -118,8 +124,6 @@ func applyRules() {
 		}
 	})
 	cells = buf[:][:]
-	// fmt.Printf("LENGTH: %v\nCAPACITY: %v\nSEED: %v\n", len(buf), cap(buf), buf)
-	// fmt.Printf("LENGTH: %v\nCAPACITY: %v\nCELLS: %v\n", len(cells), cap(cells), cells)
 }
 
 func draw() {
@@ -129,9 +133,10 @@ func draw() {
 		case 0:
 			fmt.Print(" ")
 		case 1:
+			// fmt.Print("▒")
 			fmt.Print("•")
 		default:
-			fmt.Print("X")
+			fmt.Print("x")
 		}
 		if col == width-1 {
 			fmt.Println("")
@@ -148,7 +153,7 @@ func GameOfLife() {
 	for {
 		draw()
 		applyRules()
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(300 * time.Millisecond)
 	}
 
 }
