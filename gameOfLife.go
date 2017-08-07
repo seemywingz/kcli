@@ -124,7 +124,7 @@ func applyRules() {
 				if nw(row, col) {
 					neighbors++
 				}
-				fmt.Printf("CEll (%v,%v): alive: %v neighbors: %v\n", row, col, cells[row][col] > 0, neighbors)
+				// fmt.Printf("CEll (%v,%v): alive: %v neighbors: %v\n", row, col, cells[row][col] > 0, neighbors)
 				if cells[row][col] > 0 { // alive
 					if neighbors >= 4 || neighbors < 2 { // dies
 						buf[row][col] = 0
