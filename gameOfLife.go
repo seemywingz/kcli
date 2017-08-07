@@ -6,10 +6,11 @@ import (
 	"time"
 )
 
-const height = 50
+const height = 40
 const width = 100
 
 var cells = make([][]int, height)
+var iterations int
 
 func randSeed() {
 	seed := make([][]int, height)
@@ -17,7 +18,7 @@ func randSeed() {
 		seed[i] = make([]int, width)
 	}
 
-	for i := 0; i < 500; i++ {
+	for i := 0; i < width*2; i++ {
 		rand.Seed(time.Now().UnixNano())
 		seed[rand.Intn(height)][rand.Intn(width)] = 1
 	}
@@ -48,15 +49,15 @@ func getNeighbor(deltaRow, deltaCol int) func(row, col int) bool {
 func applyRules() {
 
 	buf := cells[:][:]
-	f := make([]func(int, int) bool, 8)
-	f[0] = getNeighbor(-1, -1)
-	f[1] = getNeighbor(-1, 0)
-	f[2] = getNeighbor(-1, +1)
-	f[3] = getNeighbor(0, +1)
-	f[4] = getNeighbor(0, -1)
-	f[5] = getNeighbor(+1, +1)
-	f[6] = getNeighbor(+1, 0)
-	f[7] = getNeighbor(+1, -1)
+	checkNeighbors := make([]func(int, int) bool, 8)
+	checkNeighbors[0] = getNeighbor(-1, -1)
+	checkNeighbors[1] = getNeighbor(-1, 0)
+	checkNeighbors[2] = getNeighbor(-1, +1)
+	checkNeighbors[3] = getNeighbor(0, +1)
+	checkNeighbors[4] = getNeighbor(0, -1)
+	checkNeighbors[5] = getNeighbor(+1, +1)
+	checkNeighbors[6] = getNeighbor(+1, 0)
+	checkNeighbors[7] = getNeighbor(+1, -1)
 
 	Loop2D(height, width, func(row, col int) {
 
@@ -64,8 +65,8 @@ func applyRules() {
 		if !inBounds(row, col) {
 			buf[row][col] = 2
 		} else {
-			for i := range f {
-				if f[i](row, col) {
+			for i := range checkNeighbors {
+				if checkNeighbors[i](row, col) {
 					neighbors++
 				}
 			}
@@ -101,6 +102,7 @@ func draw() {
 			fmt.Println("")
 		}
 	})
+	fmt.Println("Iterations:", iterations)
 }
 
 // GameOfLife : conways game of life
@@ -112,7 +114,8 @@ func GameOfLife() {
 	for {
 		draw()
 		applyRules()
-		time.Sleep(300 * time.Millisecond)
+		time.Sleep(40 * time.Millisecond)
+		iterations++
 	}
 
 }
