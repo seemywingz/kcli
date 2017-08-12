@@ -9,7 +9,7 @@ import (
 )
 
 const height = 40
-const width = 100
+const width = 155
 
 var cells = make([][]int, height)
 var iterations int
@@ -20,7 +20,7 @@ func randSeed() {
 		seed[i] = make([]int, width)
 	}
 
-	for i := 0; i < width*2; i++ {
+	for i := 0; i < width*3; i++ {
 		rand.Seed(time.Now().UnixNano())
 		seed[rand.Intn(height)][rand.Intn(width)] = 1
 	}
