@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math/rand"
 	"time"
+
+	gt "github.com/seemywingz/gtils"
 )
 
 const height = 40
@@ -23,7 +25,7 @@ func randSeed() {
 		seed[rand.Intn(height)][rand.Intn(width)] = 1
 	}
 
-	cells = seed[:][:]
+	cells = seed
 }
 
 func inBounds(row, col int) bool {
@@ -59,7 +61,7 @@ func applyRules() {
 	checkNeighbors[6] = getNeighbor(+1, 0)
 	checkNeighbors[7] = getNeighbor(+1, -1)
 
-	Loop2D(height, width, func(row, col int) {
+	gt.Loop2D(height, width, func(row, col int) {
 
 		neighbors := 0
 		if !inBounds(row, col) {
@@ -76,23 +78,27 @@ func applyRules() {
 					buf[row][col] = 0
 				}
 			}
-			if cell == 0 { // alive
+			if cell == 0 { // dead
 				if neighbors == 3 { // born
 					buf[row][col] = 1
 				}
 			}
 		}
 	})
+	// if gt.MultiDimentionalSliceEq(cells, buf) {
+	// 	os.Exit(0)
+	// }
 	cells = buf[:][:]
 }
 
 func draw() {
 	print("\033[H\033[2J") // clear screen
-	Loop2D(height, width, func(row, col int) {
+	gt.Loop2D(height, width, func(row, col int) {
 		switch cells[row][col] {
 		case 0:
 			fmt.Print(" ")
 		case 1:
+			// fmt.Print("◉")
 			// fmt.Print("▒")
 			fmt.Print("•")
 		default:

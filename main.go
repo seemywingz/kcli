@@ -29,8 +29,6 @@ func main() {
 	GetConfig()
 
 	switch options.Verbs {
-	case "status":
-		Status()
 	case "config":
 		Configure()
 	case "life":

@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	gt "github.com/seemywingz/gtils"
 )
 
 const configDir = ".kcli"
@@ -26,8 +28,8 @@ var config jsonConfig
 // SaveConfig : writes the current config to disk
 func SaveConfig() {
 	data, jsoEerr := json.Marshal(config)
-	EoE("Error Parsing Json:", jsoEerr)
-	EoE("Error Saving Config File:", ioutil.WriteFile(configFile, data, 0644))
+	gt.EoE("Error Parsing Json:", jsoEerr)
+	gt.EoE("Error Saving Config File:", ioutil.WriteFile(configFile, data, 0644))
 }
 
 // ListConfig : prints the current config
@@ -63,12 +65,12 @@ func Configure() {
 		print("\n")
 		println("📝  Writing ", configFile)
 		println("❗  Fields are Required\n")
-		SetFromInput(&config.Fname, "First Name:❗  ")
-		SetFromInput(&config.Lname, " Last Name:❗  ")
-		SetFromInput(&config.Email, "     Email:📧  ")
+		gt.SetFromInput(&config.Fname, "First Name:❗  ")
+		gt.SetFromInput(&config.Lname, " Last Name:❗  ")
+		gt.SetFromInput(&config.Email, "     Email:📧  ")
 	}
 
-	if Confirm("Save Configuratuon File?") {
+	if gt.Confirm("Save Configuratuon File?") {
 		SaveConfig()
 		println("\n✨  Configuration File Saved Successfully")
 		os.Exit(0)
@@ -79,16 +81,16 @@ func Configure() {
 
 // GetConfig : Check to see if there is a config file, if not create one
 func GetConfig() {
-	homeDir = GetHomeDir()
+	homeDir = gt.GetHomeDir()
 	if homeDir == "" {
 		os.Exit(1)
 	}
 	configFile = filepath.Join(homeDir, configDir, configFileName)
 	if _, err := os.Stat(configFile); os.IsNotExist(err) {
 		println("❗  CONFIG NOT FOUND")
-		if Confirm("⚙  Want to Create one now?") {
+		if gt.Confirm("⚙  Want to Create one now?") {
 			err := os.MkdirAll(filepath.Join(homeDir, configDir), os.ModePerm)
-			EoE("Error Creating Config Directory:", err)
+			gt.EoE("Error Creating Config Directory:", err)
 			Configure()
 		} else {
 			println("⏩  Skipping Configuration File Creation")
@@ -96,11 +98,11 @@ func GetConfig() {
 		}
 	} else { // config exists
 		jsonFile, err := ioutil.ReadFile(configFile)
-		EoE("Error Reading Config File:", err)
+		gt.EoE("Error Reading Config File:", err)
 		json.Unmarshal(jsonFile, &config)
-		config.IP = GetIP()
+		config.IP = gt.GetIP()
 		name, err := os.Hostname()
-		EoE("Error Getting Hostname", err)
+		gt.EoE("Error Getting Hostname", err)
 		config.Hostname = name
 	}
 }
