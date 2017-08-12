@@ -85,9 +85,6 @@ func applyRules() {
 			}
 		}
 	})
-	// if gt.MultiDimentionalSliceEq(cells, buf) {
-	// 	os.Exit(0)
-	// }
 	cells = buf[:][:]
 }
 
