@@ -5,8 +5,9 @@ import (
 )
 
 type optionsDef struct {
-	Help goptions.Help `goptions:"-h, --help, description='Show this help'"`
-	Tail goptions.Help `goptions:"-t, --tail, description='Follow the logs'"`
+	Help    goptions.Help `goptions:"-h, --help, description='Show this help'"`
+	Tail    bool          `goptions:"-t, --tail, description='Follow the logs'"`
+	Verbose bool          `goptions:"-v, --verbose, description='Verbose'"`
 
 	goptions.Verbs
 	Status struct {
@@ -14,6 +15,12 @@ type optionsDef struct {
 
 	Life struct {
 	} `goptions:"life"`
+
+	Mtg struct {
+		Set     string `goptions:"-s, --set, description='TLA (three letter abreviation) for Set Name'"`
+		Name    string `goptions:"-n, --name, description='Name of the card to lookup'"`
+		SetName string `goptions:"--set-name, description='Full Set Name'"`
+	} `goptions:"mtg"`
 
 	Config struct {
 		Name  string `goptions:"-n, --name, description='Set Name in config file'"`
@@ -33,6 +40,8 @@ func main() {
 		Configure()
 	case "life":
 		GameOfLife()
+	case "mtg":
+		Mtg()
 	default:
 		ListConfig()
 	}
